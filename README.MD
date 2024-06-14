@@ -182,6 +182,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+This files shoud be located in Repository with the following structure:
+
+```
+.
+├── .github
+│   └── workflows
+│       └── build.yml
+├── Dockerfile
+└── server.py
+```
+
 ### <a name="step-3"></a>Step 3: Terraform Setup for EKS and ArgoCD
 
 Use Terraform to create an EKS cluster, install ArgoCD using Helm, and set up Route53 DNS records.

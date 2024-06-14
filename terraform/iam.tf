@@ -30,13 +30,13 @@ resource "aws_iam_role_policy_attachment" "mycluster-cluster-AmazonEKSVPCResourc
 }
 
 data "tls_certificate" "cert" {
-  url = module.eks.identity[0].oidc[0].issuer
+  url = aws_eks_cluster.mycluster.identity[0].oidc[0].issuer
 }
 
 resource "aws_iam_openid_connect_provider" "openid_connect" {
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.cert.certificates.0.sha1_fingerprint]
-  url             = module.eks.identity[0].oidc[0].issuer
+  url             = aws_eks_cluster.mycluster.identity[0].oidc[0].issuer
 }
 
 
@@ -69,12 +69,6 @@ resource "aws_iam_policy" "secrets_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        "Sid" : "AllowListHostedZones",
-        "Effect" : "Allow",
-        "Action" : "route53:ChangeResourceRecordSets",
-        "Resource" : data.aws_route53_zone.mycluster.arn
-      },
       {
         "Sid" : "AllowListHostedZones1",
         "Effect" : "Allow",
