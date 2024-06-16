@@ -36,7 +36,7 @@ This project includes:
 
 ## <a name="setup-guide"></a>Setup Guide
 
-Before you begin, make sure you have the necessary prerequisites installed and configured. Also, create a new GitHub repository to store the application code. And create a new repository for the Terraform and ArgoCD configuration.
+Before you begin, ensure you have the necessary prerequisites installed and configured. Also, create a new GitHub repository to store the application code. And create a new repository for the Terraform and ArgoCD configuration.
 **`Files from step 1,2,3 should be located in the application repository. Files from step 4,5 should be located in the Terraform and ArgoCD repository.`**
 
 App repository structure:
@@ -125,7 +125,7 @@ CMD ["python3", "server.py"]
 
 ### <a name="step-2"></a>Step 2: GitHub Actions Workflow
 
-The GitHub Actions workflow builds, test and pushes the Docker image to Docker Hub upon every push to the main branch.
+The GitHub Actions workflow builds, tests, and pushes the Docker image to Docker Hub upon every push to the main branch.
 
 #### GitHub Actions Workflow (`.github/workflows/build.yml`):
 
@@ -216,7 +216,7 @@ jobs:
 
 ### <a name="step-3"></a>Step 3: ArgoCD Service Files
 
-In app repository, create the following Kubernetes service files: `dev/deployment.yml`, `dev/service.yml`, and `dev/ingress.yml`.
+In the app repository, create the following Kubernetes service files: `dev/deployment.yml`, `dev/service.yml`, and `dev/ingress.yml`.
 
 (`dev/deployment.yml`) contains the Kubernetes deployment manifest for the application.
 
@@ -247,9 +247,9 @@ spec:
                   number: 80
 ```
 
-Ingress used to route traffic to the application service and is used to access the application from the internet on the specified domain.
+Ingress is used to route traffic to the application service and is used to access the application from the internet on the specified domain.
 
-**Thats it for the application repository. Now, let's move on to the Terraform and ArgoCD repository.**
+**That it for the application repository. Now, let's move on to the Terraform and ArgoCD repository.**
 </br>
 </br>
 
