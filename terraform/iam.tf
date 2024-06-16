@@ -1,6 +1,6 @@
 # For cluster
 resource "aws_iam_role" "cluster" {
-  name = "${var.name}-eks-role"
+  name = "${var.cluster_name}-eks-role"
 
   assume_role_policy = <<POLICY
 {
@@ -16,7 +16,7 @@ resource "aws_iam_role" "cluster" {
   ]
 }
 POLICY
-  tags               = merge(local.tags, { Name = "${var.name}-eks-role" })
+  tags               = merge(local.tags, { Name = "${var.cluster_name}-eks-role" })
 }
 
 resource "aws_iam_role_policy_attachment" "mycluster-cluster-AmazonEKSClusterPolicy" {
@@ -42,7 +42,7 @@ resource "aws_iam_openid_connect_provider" "openid_connect" {
 
 # For nodes
 resource "aws_iam_role" "mycluster-node" {
-  name = "${var.name}-eks-node"
+  name = "${var.cluster_name}-eks-node"
 
   assume_role_policy = <<POLICY
 {
@@ -58,7 +58,7 @@ resource "aws_iam_role" "mycluster-node" {
   ]
 }
 POLICY
-  tags               = merge(local.tags, { Name = "${var.name}-eks-node" })
+  tags               = merge(local.tags, { Name = "${var.cluster_name}-eks-node" })
 }
 
 resource "aws_iam_policy" "secrets_policy" {
@@ -69,6 +69,12 @@ resource "aws_iam_policy" "secrets_policy" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      #{
+      #  "Sid" : "AllowListHostedZones",
+      #  "Effect" : "Allow",
+      #  "Action" : "route53:ChangeResourceRecordSets",
+      #  "Resource" : data.aws_route53_zone.mycluster.arn
+      #},
       {
         "Sid" : "AllowListHostedZones1",
         "Effect" : "Allow",

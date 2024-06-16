@@ -1,34 +1,25 @@
-variable "name" {
+variable "cluster_name" {
   description = "value of the name of cluster"
-  type        = string
 }
 
 variable "region" {
   description = "value of the region"
-  type        = string
 }
 
 variable "iam_profile" {
   description = "value of the iam profile"
   default     = null
-  type = object({
-    name = string
-    arn  = string
-  })
 }
 
 variable "hosted_zone_name" {
   description = "value of the hosted zone name"
-  type        = string
 }
 
 variable "vpc_id" {
   description = "value of the vpc id"
-  type        = string
 }
 variable "subnets_ids" {
   description = "value of the subnets ids"
-  type        = list(string)
 }
 
 locals {

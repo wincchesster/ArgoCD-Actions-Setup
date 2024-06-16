@@ -1,4 +1,4 @@
-# DevOps with ArgoCD and GitHub Actions
+# DevOps with ArgoCD and GitHub Actions on EKS
 
 This is a practical example of how to configure ArgoCD, GitHub Actions, and deploy applications using Kubernetes. This project is designed to demonstrate the key aspects of a DevOps engineer's workflow.
 
@@ -18,8 +18,9 @@ This project includes:
 - [Setup Guide](#setup-guide)
   - [Step 1: Python Server and Dockerfile](#step-1)
   - [Step 2: GitHub Actions Workflow](#step-2)
-  - [Step 3: Terraform Setup for EKS and ArgoCD](#step-3)
-  - [Step 4: ArgoCD Application](#step-4)
+  - [Step 3: ArgoCD Service Files](#step-3)
+  - [Step 4: Terraform Setup for EKS and ArgoCD](#step-4)
+  - [Step 5: ArgoCD Application](#step-5)
 - [Result](#result)
 - [Conclusion](#conclusion)
 - [Contributing](#contributing)
@@ -34,6 +35,9 @@ This project includes:
 - GitHub repository setup with necessary secrets.
 
 ## <a name="setup-guide"></a>Setup Guide
+
+Before you begin, make sure you have the necessary prerequisites installed and configured. Also, create a new GitHub repository to store the application code. And create a new repository for the Terraform and ArgoCD configuration.
+**Files from step 1,2,3 should be located in the application repository. Files from step 4,5 should be located in the Terraform and ArgoCD repository.**
 
 ### <a name="step-1"></a>Step 1: Python Server and Dockerfile
 
@@ -182,6 +186,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+### <a name="step-3"></a>Step 3: ArgoCD Service Files
+
+In app repository, create the following Kubernetes service files: `dev/deployment.yml`, `dev/service.yml`, and `dev/ingress.yml`.
+
 This files shoud be located in Repository with the following structure:
 
 ```
@@ -189,11 +197,15 @@ This files shoud be located in Repository with the following structure:
 ├── .github
 │   └── workflows
 │       └── build.yml
+├── dev
+│   └── deployment.yml
+|   └── service.yml
+|   └── ingress.yml
 ├── Dockerfile
 └── server.py
 ```
 
-### <a name="step-3"></a>Step 3: Terraform Setup for EKS and ArgoCD
+### <a name="step-4"></a>Step 4: Terraform Setup for EKS and ArgoCD
 
 Use Terraform to create an EKS cluster, install ArgoCD using Helm, and set up Route53 DNS records.
 
@@ -246,7 +258,7 @@ resource "aws_route53_record" "argocd" {
 }
 ```
 
-### <a name="step-4"></a>Step 4: ArgoCD Application
+### <a name="step-5"></a>Step 5: ArgoCD Application
 
 Create a Kubernetes manifest to deploy the application using ArgoCD.
 

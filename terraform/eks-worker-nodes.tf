@@ -1,6 +1,6 @@
 resource "aws_eks_node_group" "mycluster-amd" {
   cluster_name    = aws_eks_cluster.mycluster.name
-  node_group_name = "${var.name}-amd"
+  node_group_name = "${var.cluster_name}-amd"
   node_role_arn   = aws_iam_role.mycluster-node.arn
   subnet_ids      = var.subnets_ids
 
@@ -22,5 +22,5 @@ resource "aws_eks_node_group" "mycluster-amd" {
     aws_iam_role_policy_attachment.mycluster-node-AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.mycluster-node-AmazonEC2ContainerRegistryReadOnly,
   ]
-  tags = merge(local.tags, { Name = "${var.name}-amd" })
+  tags = merge(local.tags, { Name = "${var.cluster_name}-amd" })
 }

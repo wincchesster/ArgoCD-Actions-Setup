@@ -32,7 +32,7 @@ data "kubernetes_service" "argocd_server" {
 
 resource "aws_route53_record" "argocd" {
   zone_id = data.aws_route53_zone.selected.zone_id
-  name    = "argocd.${var.name}"
+  name    = "argocd.${var.cluster_name}"
   type    = "CNAME"
   ttl     = 300
 

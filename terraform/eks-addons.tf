@@ -15,7 +15,7 @@ module "eks-external-dns" {
 
 
 resource "aws_eks_addon" "coredns" {
-  cluster_name                = var.name
+  cluster_name                = var.cluster_name
   addon_name                  = "coredns"
   addon_version               = "v1.11.1-eksbuild.4"
   resolve_conflicts_on_create = "OVERWRITE"

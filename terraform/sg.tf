@@ -1,7 +1,7 @@
 resource "aws_security_group" "mycluster-cluster" {
-  name        = "${var.name}-eks-sg"
+  name        = "${var.cluster_name}-eks-sg"
   description = "Cluster communication with worker nodes"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = var.vpc_id
 
   egress {
     from_port   = 0
@@ -10,7 +10,7 @@ resource "aws_security_group" "mycluster-cluster" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge(local.tags, { Name = "${var.name}-eks-sg" })
+  tags = merge(local.tags, { Name = "${var.cluster_name}-eks-sg" })
 }
 
 data "http" "workstation-external-ip" {
