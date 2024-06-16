@@ -328,12 +328,15 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 > **Note:** After creating the EKS cluster, you need to configure `kubectl` to connect to the cluster. You can do this by running `aws eks --region <region> update-kubeconfig --name <cluster_name> --profile <your_profile>`.
 
+</br>
+</br>
+
 ### <a name="step-5"></a>Step 5: ArgoCD Application
 
 Login to ArgoCD using command argocd
 
 ```bash
-login <argocd_server> --username admin --password <argocd_password>
+argocd login <argocd_server>
 ```
 
 Add the application repository to ArgoCD using the following command:
@@ -379,17 +382,19 @@ The application should now be deployed to the EKS cluster using ArgoCD.
 
 </br>
 
-## **Now after every push to the main branch, the GitHub Actions workflow will build, test and push the Docker image to Docker Hub if the tests pass. The deployment.yml file will be updated with the new image tag and pushed to the repository. ArgoCD will automatically sync the application and deploy the new image to the EKS cluster.**
+#### **Now after every push to the main branch, the GitHub Actions workflow will build, test and push the Docker image to Docker Hub if the tests pass. The deployment.yml file will be updated with the new image tag and pushed to the repository. ArgoCD will automatically sync the application and deploy the new image to the EKS cluster.**
 
 <img src="https://i.imgur.com/RwMtOPp.png" alt="Result" width="90%">
 
 ## <a name="result"></a>Result
 
 1. Python Server: A simple HTTP server running on port 80.
-2. Docker Image: Built and pushed to Docker Hub using GitHub Actions.
-3. EKS Cluster: Created using Terraform.
-4. ArgoCD: Installed in the EKS cluster using Helm.
-5. Application Deployment: Automatically updated in the EKS cluster using ArgoCD.
+2. Docker Image: Built? test and pushed to Docker Hub using GitHub Actions.
+3. If the tests pass, the image is pushed to Docker Hub and the deployment.yml file is updated with the new image tag.
+4. EKS Cluster: Created using Terraform.
+5. ArgoCD: Installed in the EKS cluster using Helm.
+6. Application Deployment: Automatically updated in the EKS cluster using ArgoCD.
+7. ArgoCD: Automatically syncs the application and deploys the new image to the EKS cluster.
 
 ## <a name="conclusion"></a>Conclusion
 
