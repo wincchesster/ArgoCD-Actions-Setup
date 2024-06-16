@@ -241,9 +241,9 @@ Ingress used to route traffic to the application service and is used to access t
 
 ### <a name="step-4"></a>Step 4: Terraform Setup for EKS and ArgoCD
 
-Use Terraform to create an EKS cluster, install ArgoCD using Helm, and set up Route53 DNS records.
+Use Terraform files to create an EKS cluster, install ArgoCD using Helm, and set up Route53 DNS records.
 
-#### Terraform Code:
+#### ArgoCD installation using Helm (`argocd.tf`):
 
 ```hcl
 resource "kubernetes_namespace" "argocd" {
@@ -292,6 +292,22 @@ resource "aws_route53_record" "argocd" {
 }
 ```
 
+After applying the Terraform configuration, you should have an EKS cluster running with ArgoCD installed.
+
+Ckuster view using k9s:
+
+ArgoCD web UI:
+
+To find the ArgoCD password, run the following command:
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+```
+
+> **Note:** Make sure to update the `argocd.tf` file with the correct domain name and Route53 zone ID.
+
+> **Note:** After creating the EKS cluster, you need to configure `kubectl` to connect to the cluster. You can do this by running `aws eks --region <region> update-kubeconfig --name <cluster_name> --profile <your_profile>`.
+
 ### <a name="step-5"></a>Step 5: ArgoCD Application
 
 Create a Kubernetes manifest to deploy the application using ArgoCD.
@@ -307,7 +323,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "https://github.com/<username>/example-app.git"
+    repoURL: "<app_repository_url>"
     targetRevision: HEAD
     path: dev
   destination:
