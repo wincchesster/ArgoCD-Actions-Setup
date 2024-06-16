@@ -228,7 +228,9 @@ spec:
 
 Ingress used to route traffic to the application service and is used to access the application from the internet on the specified domain.
 
-Thats it for the application repository. Now, let's move on to the Terraform and ArgoCD repository.
+**Thats it for the application repository. Now, let's move on to the Terraform and ArgoCD repository.**
+
+---
 
 </br>
 </br>
