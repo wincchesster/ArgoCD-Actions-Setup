@@ -54,6 +54,11 @@ App repository structure:
 └── server.py
 ```
 
+</br>
+</br>
+
+---
+
 ### <a name="step-1"></a>Step 1: Python Server and Dockerfile
 
 The Python server is a simple HTTP server implemented using Python's http.server module. The server listens on port 80 and responds with a simple HTML page.
@@ -229,11 +234,10 @@ spec:
 Ingress used to route traffic to the application service and is used to access the application from the internet on the specified domain.
 
 **Thats it for the application repository. Now, let's move on to the Terraform and ArgoCD repository.**
+</br>
+</br>
 
 ---
-
-</br>
-</br>
 
 ### <a name="step-4"></a>Step 4: Terraform Setup for EKS and ArgoCD
 
