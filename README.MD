@@ -294,21 +294,37 @@ resource "aws_route53_record" "argocd" {
 
 After applying the Terraform configuration, you should have an EKS cluster running with ArgoCD installed.
 
-Ckuster view using k9s:
-
+Cluster view using k9s:
+<img src="https://i.imgur.com/O4IPl8Y.png" alt="Result" width="90%">
+</br>
 ArgoCD web UI:
-
+<img src="https://i.imgur.com/e51kxzu.png" alt="Result" width="90%">
+</br>
 To find the ArgoCD password, run the following command:
 
 ```bash
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
 
+</br>
+
 > **Note:** Make sure to update the `argocd.tf` file with the correct domain name and Route53 zone ID.
 
 > **Note:** After creating the EKS cluster, you need to configure `kubectl` to connect to the cluster. You can do this by running `aws eks --region <region> update-kubeconfig --name <cluster_name> --profile <your_profile>`.
 
 ### <a name="step-5"></a>Step 5: ArgoCD Application
+
+Login to ArgoCD using command argocd
+
+```bash
+login <argocd_server> --username admin --password <argocd_password>
+```
+
+Add the application repository to ArgoCD using the following command:
+
+```bash
+argocd repo add <app_repository_url> --username <github_username> --password <github_token>
+```
 
 Create a Kubernetes manifest to deploy the application using ArgoCD.
 
@@ -334,6 +350,16 @@ spec:
       prune: true
       selfHeal: true
 ```
+
+Apply the application manifest using the following command:
+
+```bash
+kubectl apply -f argocd/app.yaml
+```
+
+The application should now be deployed to the EKS cluster using ArgoCD.
+
+<img src="https://i.imgur.com/NrGmje7.png" alt="Result" width="90%">
 
 ## <a name="result"></a>Result
 
