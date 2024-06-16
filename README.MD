@@ -188,6 +188,22 @@ jobs:
         if: always()
         run: docker rm -f test-container
 
+      - name: Update deployment.yml with commit hash
+        if: success()
+        run: |
+          sed -i "s|image: <username>/example-app:.*|image: <username>/example-app:${{ github.sha }}|g" dev/deployment.yml
+
+      - name: Commit updated deployment.yml
+        if: success()
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN_WRITE }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add dev/deployment.yml
+          git commit -m "Update deployment.yml with image tag ${{ github.sha }}"
+          git push https://x-access-token:${{ secrets.ACCESS_TOKEN_WRITE }}@github.com/<username>/example-app.git HEAD:main
+
       - name: Push Docker image
         if: success()
         uses: docker/build-push-action@v2
@@ -360,6 +376,12 @@ kubectl apply -f argocd/app.yaml
 The application should now be deployed to the EKS cluster using ArgoCD.
 
 <img src="https://i.imgur.com/NrGmje7.png" alt="Result" width="90%">
+
+</br>
+
+## **Now after every push to the main branch, the GitHub Actions workflow will build, test and push the Docker image to Docker Hub if the tests pass. The deployment.yml file will be updated with the new image tag and pushed to the repository. ArgoCD will automatically sync the application and deploy the new image to the EKS cluster.**
+
+<img src="https://i.imgur.com/RwMtOPp.png" alt="Result" width="90%">
 
 ## <a name="result"></a>Result
 
