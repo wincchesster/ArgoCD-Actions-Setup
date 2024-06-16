@@ -37,7 +37,7 @@ This project includes:
 ## <a name="setup-guide"></a>Setup Guide
 
 Before you begin, make sure you have the necessary prerequisites installed and configured. Also, create a new GitHub repository to store the application code. And create a new repository for the Terraform and ArgoCD configuration.
-**Files from step 1,2,3 should be located in the application repository. Files from step 4,5 should be located in the Terraform and ArgoCD repository.**
+**`Files from step 1,2,3 should be located in the application repository. Files from step 4,5 should be located in the Terraform and ArgoCD repository.`**
 
 ### <a name="step-1"></a>Step 1: Python Server and Dockerfile
 
