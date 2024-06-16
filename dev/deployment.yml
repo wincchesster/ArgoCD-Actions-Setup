@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  labels:
+    app: example-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-app
+  template:
+    metadata:
+      labels:
+        app: example-app
+      annotations:
+        commit-hash: "{{ .Values.commitHash }}"
+    spec:
+      containers:
+      - name: example-app
+        image: <yourname>/example:latest
+        imagePullPolicy: Always
+        ports:
+          - name: http
+            containerPort: 80

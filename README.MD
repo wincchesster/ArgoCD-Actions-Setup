@@ -39,6 +39,21 @@ This project includes:
 Before you begin, make sure you have the necessary prerequisites installed and configured. Also, create a new GitHub repository to store the application code. And create a new repository for the Terraform and ArgoCD configuration.
 **`Files from step 1,2,3 should be located in the application repository. Files from step 4,5 should be located in the Terraform and ArgoCD repository.`**
 
+App repository structure:
+
+```
+.
+├── .github
+│   └── workflows
+│       └── build.yml
+├── dev
+│   └── deployment.yml
+|   └── service.yml
+|   └── ingress.yml
+├── Dockerfile
+└── server.py
+```
+
 ### <a name="step-1"></a>Step 1: Python Server and Dockerfile
 
 The Python server is a simple HTTP server implemented using Python's http.server module. The server listens on port 80 and responds with a simple HTML page.
@@ -66,7 +81,7 @@ class MyServer(BaseHTTPRequestHandler):
             self.wfile.write(bytes("body {background-color: black; color: white; height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; font-family: 'Montserrat', sans-serif;}", "utf-8"))
             self.wfile.write(bytes("</style></head>", "utf-8"))
             self.wfile.write(bytes("<body>", "utf-8"))
-            self.wfile.write(bytes("<h1>STEP 4 UPDATE</h1>", "utf-8"))
+            self.wfile.write(bytes("<h1>Example</h1>", "utf-8"))
             self.wfile.write(bytes("</body></html>", "utf-8"))
         elif self.path == "/stress":
             self.wfile.write(bytes("<html><head><title>Stress Test</title></head>", "utf-8"))
@@ -94,12 +109,9 @@ if __name__ == "__main__":
 #### Dockerfile:
 
 ```Dockerfile
-FROM ubuntu:latest
+FROM alpine:latest
 
-RUN apt-get update
-RUN apt-get install -y python3
-RUN apt-get install -y python3-pip
-
+RUN apk update && apk add --no-cache python3 py3-pip
 WORKDIR /app
 COPY . /app
 
@@ -108,7 +120,7 @@ CMD ["python3", "server.py"]
 
 ### <a name="step-2"></a>Step 2: GitHub Actions Workflow
 
-The GitHub Actions workflow builds and pushes the Docker image to Docker Hub upon every push to the main branch.
+The GitHub Actions workflow builds, test and pushes the Docker image to Docker Hub upon every push to the main branch.
 
 #### GitHub Actions Workflow (`.github/workflows/build.yml`):
 
@@ -127,7 +139,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build-test-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -146,64 +158,80 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
+      - name: Build Docker image
+        id: build
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
-          push: true
-          tags: wincchesster/step-4-app:latest, wincchesster/step-4-app:${{ github.sha }}
+          push: false
+          tags: <username>/example-app:latest
 
       - name: Test
         run: |
-          docker run --rm -d -p 8080:80 --name test-container wincchesster/step-4-app:latest
+          docker run --rm -d -p 8080:80 --name test-container <username>/example-app:latest
           sleep 10 
           response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
           if [ "$response" -ne 200 ]; then
             echo "Test Failed: HTTP response is $response"
             exit 1
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Cleanup
+        if: always()
         run: docker rm -f test-container
 
-      - name: Get the current commit hash
-        id: vars
-        run: echo "::set-output name=hash::$(git rev-parse HEAD)"
-
-      - name: Update deployment file with the new commit hash
-        run: |
-          sed -i 's/commit-hash: .*/commit-hash: "'${{ steps.vars.outputs.hash }}'"/' dev/deployment.yml
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add deploy/deployment.yaml
-          git commit -m "Update deployment with commit hash"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push Docker image
+        if: success()
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: <username>/example-app:latest, <username>/example-app:${{ github.sha }}
 ```
 
 ### <a name="step-3"></a>Step 3: ArgoCD Service Files
 
 In app repository, create the following Kubernetes service files: `dev/deployment.yml`, `dev/service.yml`, and `dev/ingress.yml`.
 
-This files shoud be located in Repository with the following structure:
+(`dev/deployment.yml`) contains the Kubernetes deployment manifest for the application.
 
+(`dev/service.yml`) contains the Kubernetes service manifest for the application.
+
+(`dev/ingress.yml`) contains the Kubernetes ingress manifest for the application.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  namespace: dev
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: "app.mycluster.example.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: example-service
+                port:
+                  number: 80
 ```
-.
-├── .github
-│   └── workflows
-│       └── build.yml
-├── dev
-│   └── deployment.yml
-|   └── service.yml
-|   └── ingress.yml
-├── Dockerfile
-└── server.py
-```
+
+Ingress used to route traffic to the application service and is used to access the application from the internet on the specified domain.
+
+Thats it for the application repository. Now, let's move on to the Terraform and ArgoCD repository.
+
+</br>
+</br>
 
 ### <a name="step-4"></a>Step 4: Terraform Setup for EKS and ArgoCD
 
@@ -268,12 +296,12 @@ Create a Kubernetes manifest to deploy the application using ArgoCD.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: step-4-app
+  name: example-app
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: "https://github.com/wincchesster/step-4-app.git"
+    repoURL: "https://github.com/<username>/example-app.git"
     targetRevision: HEAD
     path: dev
   destination:
